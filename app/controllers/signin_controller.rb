@@ -1,24 +1,32 @@
-class SignupController < ApplicationController
+class SigninController < ApplicationController
+	before_action :authorize_access_request!, only: [:destroy] #Possibility to logout only if you're logged in
+  
 	def create
-		user = User.new(user_params)
-		if user.save
+	  user = User.find_by!(email: params[:email])
+	  if user.authenticate(params[:password])
 			payload  = { user_id: user.id }
 			session = JWTSessions::Session.new(payload: payload, refresh_by_access_allowed: true)
 			tokens = session.login
-
+		
 			response.set_cookie(JWTSessions.access_cookie,
-													value: tokens[:access],
-													httponly: true,
-													secure: Rails.env.production?)
+								value: tokens[:access],
+								httponly: true,
+								secure: Rails.env.production?)
 			render json: { csrf: tokens[:csrf] }
-		else
-			render json: { error: user.errors.full_messages.join(' ') }, status: :unprocessable_entity
-		end
+	  else
+			not_found
+	  end
 	end
-
+  
+	def destroy
+	  session = JWTSessions::Session.new(payload: payload)
+	  session.flush_by_access_payload
+	  render json: :ok
+	end
+  
 	private
-
-	def user_params
-		params.permit(:email, :password, :password_confirmation)
+  
+	def not_found
+	  render json: { error: 'Cannont find such email/password combination' }, status: :not_found
 	end
 end
