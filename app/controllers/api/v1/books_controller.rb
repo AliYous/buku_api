@@ -7,7 +7,6 @@ module Api
 				# GET /books
 				def index
 					@books = current_user.books
-
 					render json: @books
 				end
 				
