@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :books
+      get 'me', controller: :users, action: :show
     end
   end
 
