@@ -5,12 +5,8 @@ module Api
                 
 				# GET /me
 				def show
-					if current_user
-						@user = current_user 
-						render json: @user
-					else
-						render json: {status: "error", code: 401, message: "Can't find current user"}
-					end	
+					@user = User.find_by!(params[:email])
+					render json: @user
 				end      
 			end
 	end
