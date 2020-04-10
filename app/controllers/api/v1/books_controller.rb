@@ -17,10 +17,10 @@ module Api
 				
 				# POST /books
 				def create
-				@books = books.create!(book_params) #current_user.books.build(book_params)
+					@book = Book.new(book_params) #current_user.books.build(book_params)
 
 					if @book.save
-						render json: @book, status: :created, location: @book
+						render json: @book, status: :created
 					else
 						render json: @book.errors, status: :unprocessable_entity
 					end
